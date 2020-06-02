@@ -18,6 +18,7 @@ func main() {
 	var p = parser.String("p", "port", &argparse.Options{Help: "Port to server [Default 9090]"})
 	var s = parser.Flag("s", "ssl", &argparse.Options{Help: "SSL [Default false]"})
 	var d = parser.String("d", "directory", &argparse.Options{Help: "Directory"})
+	var u = parser.Flag("u", "upload", &argparse.Options{Help: "Upload [Default false]"})
 	var auth = parser.String("a", "auth", &argparse.Options{Help: "Authentication - Set username:password"})
 
 	err := parser.Parse(os.Args)
@@ -26,7 +27,7 @@ func main() {
 	}
 
 	// Send flags for logic check (valid ip/port, user/pass)
-	a := cmd.ProcessArguments(i, p, d, auth, s)
+	a := cmd.ProcessArguments(i, p, d, auth, s, u)
 
 	/* Debug flags
 	fmt.Printf("IP: %v\n", a.Ip)
@@ -40,8 +41,8 @@ func main() {
 
 	// Start webserver
 	if a.Ssl {
-		server.HttpsServer(a.Ip, a.Port, a.Directory, a.Username, a.Password, a.Authentication)
+		server.HttpsServer(a.Ip, a.Port, a.Directory, a.Username, a.Password, a.Authentication, a.Upload)
 	} else {
-		server.HttpServer(a.Ip, a.Port, a.Directory, a.Username, a.Password, a.Authentication)
+		server.HttpServer(a.Ip, a.Port, a.Directory, a.Username, a.Password, a.Authentication, a.Upload)
 	}
 }

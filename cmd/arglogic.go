@@ -16,6 +16,7 @@ type Arguments struct {
 	Password       string
 	Ssl            bool
 	Authentication bool
+	Upload         bool
 }
 
 // Validate IP address
@@ -31,7 +32,7 @@ func checkIfPort(str string) bool {
 	return false
 }
 
-func ProcessArguments(ip, port, directory, auth *string, ssl *bool) *Arguments {
+func ProcessArguments(ip, port, directory, auth *string, ssl, upload *bool) *Arguments {
 
 	a := new(Arguments) // Create new struct for Arguments
 
@@ -93,6 +94,12 @@ func ProcessArguments(ip, port, directory, auth *string, ssl *bool) *Arguments {
 		a.Username = username
 		a.Password = password
 
+	}
+
+	if *upload {
+		a.Upload = true
+	} else {
+		a.Upload = false
 	}
 
 	return a

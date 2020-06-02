@@ -3,17 +3,19 @@ package server
 import (
 	"context"
 	"crypto/subtle"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"httpgopha/cmd/server/ssl"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 )
 
-func HttpsServer(ip, port, dir, user, pass string, auth bool) {
+func HttpsServer(ip, port, dir, user, pass string, auth, upload bool) {
 
 	cert, key, err := ssl.KeyPair()
 	if err != nil {
@@ -24,8 +26,23 @@ func HttpsServer(ip, port, dir, user, pass string, auth bool) {
 
 		e := echo.New()
 		e.HideBanner = true
+
+		if upload {
+			rand.Seed(time.Now().UnixNano())
+			randurl := randSeq(10)
+			uploadpage := "/" + randurl
+			fullurl := "http://" + ip + ":" + port + uploadpage
+
+			fmt.Printf("Upload enabled: %s\n", fullurl)
+			fmt.Printf("curl -F 'file=@/path/to/local/file' %s\n", fullurl)
+			e.POST(uploadpage, uploadFile)
+		}
+
 		fs := http.FileServer(http.Dir(dir))
 		e.GET("/*", echo.WrapHandler(http.StripPrefix("/", fs)))
+
+		// Server header
+		e.Use(ServerHeader)
 
 		// Start server
 		go func() {
@@ -50,6 +67,20 @@ func HttpsServer(ip, port, dir, user, pass string, auth bool) {
 
 		e := echo.New()
 		e.HideBanner = true
+
+		if upload {
+			rand.Seed(time.Now().UnixNano())
+			randurl := randSeq(10)
+			uploadpage := "/" + randurl
+			fullurl := "http://" + ip + ":" + port + uploadpage
+
+			fmt.Printf("Upload enabled: %s\n", fullurl)
+			fmt.Printf("curl -F 'file=@/path/to/local/file' %s\n", fullurl)
+			e.POST(uploadpage, uploadFile)
+		}
+
+		// Server header
+		e.Use(ServerHeader)
 		fs := http.FileServer(http.Dir(dir))
 		e.GET("/*", echo.WrapHandler(http.StripPrefix("/", fs)))
 		e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) { // Auth
