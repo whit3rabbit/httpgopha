@@ -46,10 +46,17 @@ Arguments:
 ``` 
 Default
 ```
-# This will server whatever folder it's run from on port 9090
+# This will serve whatever folder it's run from on port 9090
 httpgopha
 ⇨ http server started on [::]:9090
 ```
+Server specific folder on IP
+```
+# This will serve a folder (/opt/webserver) on a specific IP with default port
+httpgopha -d /opt/webserver -i 127.0.0.1
+⇨ http server started on 127.0.0.1:9090
+```
+
 For SSL with authentication on port 443:
 ```
 httpgopha -s -a username:sup3rs3cr3tpassw0rd -p 443
